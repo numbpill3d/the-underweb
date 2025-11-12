@@ -1,5 +1,26 @@
 {
+  "name": "the-underweb",
+  "version": "1.0.0",
+  "description": "A nostalgic Web 2.0 social directory service",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["web2.0", "directory", "social", "retro"],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express-validator": "^7.0.1",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
