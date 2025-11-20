@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINKS - THE UNDERWEB</title>
+    <meta name="description" content="Explore curated links to the digital underground on THE UNDERWEB. Discover retro web aesthetics, digital art, and forgotten internet treasures.">
+    <meta property="og:title" content="THE UNDERWEB - Links">
+    <meta property="og:description" content="Explore curated links to the digital underground.">
+    <meta property="og:image" content="https://via.placeholder.com/600x150?text=THE+UNDERWEB+LINKS">
+    <meta property="og:url" content="https://example.com/links.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Base Styles and Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #0a0a14;
+            --secondary-bg: #141428;
+            --tertiary-bg: #1a1a2e;
+            --primary-text: #c8c8ff;
+            --secondary-text: #8080ff;
+            --accent-color: #4f4fff;
+            --accent-glow: #4f4fff80;
+            --border-color: #3333aa;
+            --box-shadow: 0 0 15px #2222aa;
+            --terminal-green: #00ff66;
+        }
+
+        @font-face {
+            font-family: 'VT323';
+            src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isQFJXUdVNF.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            background-image: 
+                radial-gradient(circle at 25% 25%, #1a1a5060 2%, transparent 10%),
+                radial-gradient(circle at 75% 75%, #1a1a5060 2%, transparent 10%),
+                linear-gradient(45deg, #0a0a1480 25%, transparent 25%, transparent 75%, #0a0a1480 75%);
+            background-size: 100px 100px, 100px 100px, 100px 100px;
+            background-attachment: fixed;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animation Keyframes */
+        @keyframes pulse {
+            0% { opacity: 0.7; text-shadow: 0 0 5px var(--accent-glow); }
+            50% { opacity: 1; text-shadow: 0 0 15px var(--accent-glow), 0 0 30px var(--accent-glow); }
+            100% { opacity: 0.7; text-shadow: 0 0 5px var(--accent-glow); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+            40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
+            60% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
+            80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(10, 10, 20, 0.8);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            animation: scanline 8s linear infinite;
+            z-index: 1;
+        }
+
+        .ascii-art {
+            font-size: 0.5rem;
+            line-height: 0.6rem;
+            white-space: pre;
+            text-align: center;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-glow);
+            animation: pulse 4s infinite;
+            margin-bottom: 1rem;
+            max-width: 100%;
+            overflow-x: auto;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .ascii-art {
+                font-size: 0.6rem;
+                display: block;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .ascii-art {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Navigation Styles */
+        nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 1rem;
+            gap: 1rem;
+            background-color: rgba(20, 20, 40, 0.7);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav a {
+            color: var(--secondary-text);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background-color: rgba(26, 26, 46, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(79, 79, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-text);
+            background-color: rgba(40, 40, 70, 0.9);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        nav a:hover::before {
+            left: 100%;
+        }
+
+        /* Marquee Styles */
+        marquee {
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background-color: rgba(10, 10, 20, 0.7);
+            color: var(--terminal-green);
+            font-weight: bold;
+            border-top: 1px dashed var(--border-color);
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .blink {
+            animation: fadeInOut 1s infinite;
+            color: var(--accent-color);
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .win98-box {
+            background-color: rgba(20, 20, 40, 0.8);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow);
+            margin: 1rem 0;
+            backdrop-filter: blur(5px);
+            max-width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .win98-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, transparent 65%, rgba(79, 79, 255, 0.1) 75%, transparent 85%),
+                linear-gradient(135deg, transparent 65%, rgba(79, 79, 255, 0.1) 75%, transparent 85%);
+            background-size: 100px 100px;
+            animation: float 10s infinite;
+            pointer-events: none;
+        }
+
+        .win98-box-title {
+            background: linear-gradient(90deg, var(--accent-color), var(--tertiary-bg));
+            color: #ffffff;
+            padding: 0.3rem 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .win98-box-content {
+            padding: 1rem;
+        }
+
+        /* Links Page Specific Styles */
+        .links-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .link-card {
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .link-card-header {
+            padding: 0.5rem;
+            font-weight: bold;
+            text-align: center;
+            background: linear-gradient(90deg, var(--tertiary-bg), var(--secondary-bg));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .link-card-body {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .link-card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+            filter: saturate(0.8) hue-rotate(10deg) brightness(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .link-card:hover .link-card-image {
+            filter: saturate(1.2) hue-rotate(0deg) brightness(1.1);
+        }
+
+        .link-card-description {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .link-card-tags {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--tertiary-bg);
+            color: var(--primary-text);
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+
+        .link-button:hover {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            color: var(--secondary-text);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Filter and Search Bar */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: rgba(15, 15, 30, 0.7);
+            border: 1px solid var(--border-color);
+        }
+
+        .search-box {
+            flex-grow: 1;
+            display: flex;
+            max-width: 500px;
+        }
+
+        .search-box input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            background-color: rgba(10, 10, 20, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+            font-family: 'VT323', monospace;
+        }
+
+        .search-box button {
+            padding: 0.5rem 1rem;
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            color: white;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+        }
+
+        .filter-dropdown {
+            padding: 0.5rem;
+            background-color: rgba(10, 10, 20, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+            font-family: 'VT323', monospace;
+        }
+
+        .filter-dropdown:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            color: white;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(10, 10, 20, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            z-index: 1;
+        }
+
+        /* Terminal effect overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        /* Dynamic scanline effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: rgba(120, 120, 255, 0.1);
+            box-shadow: 0 0 10px rgba(120, 120, 255, 0.2);
+            z-index: 1001;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        /* Stars background effect */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: var(--primary-text);
+            border-radius: 50%;
+            animation: pulse 3s infinite;
+        }
+
+        /* Links and Text */
+        a {
+            color: var(--secondary-text);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        a:hover {
+            color: var(--primary-text);
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        a:hover::after {
+            width: 100%;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .links-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars background effect -->
+    <div class="stars" id="stars"></div>
+
+    <header>
+        <div class="ascii-art">
+            ████████╗██╗  ██╗███████╗    ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗ ██╗    ██╗███████╗██████╗ 
+            ╚══██╔══╝██║  ██║██╔════╝    ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗██║    ██║██╔════╝██╔══██╗
+               ██║   ███████║█████╗      ██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║ █╗ ██║█████╗  ██████╔╝
+               ██║   ██╔══██║██╔══╝      ██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║███╗██║██╔══╝  ██╔══██╗
+               ██║   ██║  ██║███████╗    ╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║╚███╔███╔╝███████╗██████╔╝
+               ╚═╝   ╚═╝  ╚═╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚═════╝ 
+        </div>
+        <div class="win98-box" style="max-width: 600px; margin: 0 auto;">
+            <div class="win98-box-title">
+                <span>links.gif</span>
+                <span>X</span>
+            </div>
+            <div class="win98-box-content">
+                <img src="https://via.placeholder.com/600x150?text=THE+UNDERWEB+LINKS" alt="THE UNDERWEB Links Banner" style="width: 100%; height: auto;">
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <a href="/">HOME</a>
+        <a href="linksindex.html">INDEX</a>
+        <a href="links.html">LINKS</a>
+        <a href="about.html">ABOUT</a>
+        <a href="chat.html">CHAT</a>
+    </nav>
+
+    <marquee scrollamount="5" behavior="alternate">
+        <span class="blink">★</span> EXPLORE THE HIDDEN CORNERS OF THE INTERNET - CURATED LINKS TO THE DIGITAL UNDERGROUND <span class="blink">★</span>
+    </marquee>
+
+    <main>
+        <div class="win98-box">
+            <div class="win98-box-title">
+                <span>Link Directory</span>
+                <span>X</span>
+            </div>
+            <div class="win98-box-content">
+                <div class="filter-section">
+                    <div class="search-box">
+                        <label for="search-input">Search Links</label>
+                        <input type="text" id="search-input" placeholder="Search links...">
+                        <button id="search-button" aria-label="Search links">Search</button>
+                        <button id="reset-button" aria-label="Reset search results">Reset</button>
+                    </div>
+                    <select class="filter-dropdown" id="category-filter">
+                        <option value="all">All Categories</option>
+                        <option value="art">Digital Art</option>
+                        <option value="forums">Forums</option>
+                        <option value="tools">Tools</option>
+                        <option value="archives">Archives</option>
+                        <option value="curiosities">Digital Curiosities</option>
+                    </select>
+                    <select class="filter-dropdown" id="sort-filter">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="a-z">A-Z</option>
+                        <option value="z-a">Z-A</option>
+                    </select>
+                </div>
+                
+                <div class="category-section">
+                    <h2 class="category-title">Digital Art</h2>
+                    <div class="links-container">
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Pixel Dreams</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Pixel+Dreams" alt="Pixel Dreams" class="link-card-image" loading="lazy">
+                                <div class="link-card-description">
+                                    A collective of pixel artists creating dreamlike landscapes and surreal animations.
+                                </div>
+                                <div class="link-card-tags">
+                                    #pixelart #animation #surreal
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Glitch Gallery</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Glitch+Gallery" alt="Glitch Gallery" class="link-card-image">
+                                <div class="link-card-description">
+                                    An online exhibition space for artists exploring data corruption as an art form.
+                                </div>
+                                <div class="link-card-tags">
+                                    #glitchart #databending #digitalart
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Void Canvas</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Void+Canvas" alt="Void Canvas" class="link-card-image">
+                                <div class="link-card-description">
+                                    Experimental net.art projects exploring the liminal spaces of the web.
+                                </div>
+                                <div class="link-card-tags">
+                                    #netart #experimental #void
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-section">
+                    <h2 class="category-title">Digital Curiosities</h2>
+                    <div class="links-container">
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Forgotten Protocols</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Forgotten+Protocols" alt="Forgotten Protocols" class="link-card-image">
+                                <div class="link-card-description">
+                                    Archive of obsolete internet protocols and abandoned network technologies.
+                                </div>
+                                <div class="link-card-tags">
+                                    #protocols #retronet #webhistory
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Lost Web</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Lost+Web" alt="Lost Web" class="link-card-image">
+                                <div class="link-card-description">
+                                    Collection of websites that exist in forgotten corners of the internet, untouched for decades.
+                                </div>
+                                <div class="link-card-tags">
+                                    #geocities #abandonware #webring
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Digital Ephemera</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Digital+Ephemera" alt="Digital Ephemera" class="link-card-image">
+                                <div class="link-card-description">
+                                    Museum of transient digital artifacts from the early web era.
+                                </div>
+                                <div class="link-card-tags">
+                                    #webhistory #netnostalgia #artifacts
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-section">
+                    <h2 class="category-title">Tools & Utilities</h2>
+                    <div class="links-container">
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">NeoCities Navigator</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=NeoCities+Navigator" alt="NeoCities Navigator" class="link-card-image">
+                                <div class="link-card-description">
+                                    Discover and explore the vibrant world of independent websites on NeoCities.
+                                </div>
+                                <div class="link-card-tags">
+                                    #neocities #webtool #discovery
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Retro Web Studio</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Retro+Web+Studio" alt="Retro Web Studio" class="link-card-image">
+                                <div class="link-card-description">
+                                    Online editor for creating websites with vintage aesthetics and old-school HTML.
+                                </div>
+                                <div class="link-card-tags">
+                                    #retrocomputing #webdesign #editor
+                                </div>
+                                <a href="#" class="link-button">Visit Site</div>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">ASCII Art Generator</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=ASCII+Art+Generator" alt="ASCII Art Generator" class="link-card-image">
+                                <div class="link-card-description">
+                                    Convert images into ASCII art with various styles and character sets.
+                                </div>
+                                <div class="link-card-tags">
+                                    #ascii #textart #generator
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-section">
+                    <h2 class="category-title">Forums & Communities</h2>
+                    <div class="links-container">
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Digital Wasteland</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Digital+Wasteland" alt="Digital Wasteland" class="link-card-image">
+                                <div class="link-card-description">
+                                    Community dedicated to internet archaeology and digital preservation.
+                                </div>
+                                <div class="link-card-tags">
+                                    #forum #preservation #community
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Web Obscura</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Web+Obscura" alt="Web Obscura" class="link-card-image">
+                                <div class="link-card-description">
+                                    Forum for sharing and discussing obscure and unusual websites.
+                                </div>
+                                <div class="link-card-tags">
+                                    #obscure #weird #discussion
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                        
+                        <div class="win98-box link-card">
+                            <div class="link-card-header">Retro Web Ring</div>
+                            <div class="link-card-body">
+                                <img src="https://via.placeholder.com/300x150?text=Retro+Web+Ring" alt="Retro Web Ring" class="link-card-image">
+                                <div class="link-card-description">
+                                    Revival of the classic web ring concept, connecting sites with retro aesthetics.
+                                </div>
+                                <div class="link-card-tags">
+                                    #webring #community #retroweb
+                                </div>
+                                <a href="#" class="link-button">Visit Site</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+        <div class="win98-box" style="margin-top: 2rem;">
+            <div class="win98-box-title">
+                <span>Submit a Link</span>
+                <span>X</span>
+            </div>
+            <div class="win98-box-content">
+                <p>Have you discovered a site that belongs in THE UNDERWEB? Submit it here for consideration.</p>
+                <form id="link-submit-form">
+                    <label for="site-name">Site Name</label>
+                    <input type="text" id="site-name" placeholder="Site Name" required>
+                    <input type="url" id="site-url" placeholder="Site URL (include https://)" required>
+                    <input type="text" id="site-description" placeholder="Brief Description" required>
+                    <input type="text" id="site-tags" placeholder="Tags (comma-separated)">
+                    <select id="site-category">
+                        <option value="">Select Category</option>
+                        <option value="art">Digital Art</option>
+                        <option value="forums">Forums</option>
+                        <option value="tools">Tools</option>
+                        <option value="archives">Archives</option>
+                        <option value="curiosities">Digital Curiosities</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button type="submit">Submit Link</button>
+                </form>
+                
+                <div id="submission-message" style="display:none; margin-top: 1rem;">
+                    <p>Thank you for your submission! Your link will be reviewed by our digital archaeologists.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 THE UNDERWEB - <a href="/submit">Submit Image</a> - <a href="linksindex.html">Link Directory</a> - <a href="about.html">About</a> - <a href="chat.html">Chat/Forum</a></p>
+    </footer>
+
+    <script>
+        // Create the stars background
+        document.addEventListener("DOMContentLoaded", function() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 100;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Random properties
+                const size = Math.random() * 2 + 1;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const delay = Math.random() * 3;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+            
+            // Link submission form handling
+            const linkSubmitForm = document.getElementById('link-submit-form');
+            const submissionMessage = document.getElementById('submission-message');
+            
+            if (linkSubmitForm && submissionMessage) {
+                linkSubmitForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const siteName = document.getElementById('site-name').value.trim();
+                    const siteUrl = document.getElementById('site-url').value.trim();
+                    const siteDescription = document.getElementById('site-description').value.trim();
+
+                    if (!siteName || !siteUrl || !siteDescription) {
+                        alert('Please fill out all required fields.');
+                        return;
+                    }
+
+                    // Proceed with form submission
+                    linkSubmitForm.style.display = 'none';
+                    submissionMessage.style.display = 'block';
+                });
+            }
+            
+            // Search and filter functionality
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const resetButton = document.getElementById('reset-button');
+            const categoryFilter = document.getElementById('category-filter');
+            const sortFilter = document.getElementById('sort-filter');
+            const linkCards = document.querySelectorAll('.link-card');
+            
+            // Search function
+            if (searchButton && searchInput) {
+                searchButton.addEventListener('click', function() {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    
+                    linkCards.forEach(card => {
+                        const cardText = card.textContent.toLowerCase();
+                        const cardTags = card.querySelector('.link-card-tags').textContent.toLowerCase();
+                        
+                        if (cardText.includes(searchTerm) || cardTags.includes(searchTerm)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // Reset function
+            const resetButton = document.getElementById('reset-button');
+            if (resetButton) {
+                resetButton.addEventListener('click', function () {
+                    searchInput.value = '';
+                    linkCards.forEach(card => {
+                        card.style.display = 'flex';
+                    });
+                });
+            }
+            
+            // Category filter
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', function() {
+                    const category = categoryFilter.value;
+                    const sections = document.querySelectorAll('.category-section');
+                    
+                    if (category === 'all') {
+                        sections.forEach(section => {
+                            section.style.display = 'block';
+                        });
+                    } else {
+                        sections.forEach(section => {
+                            const sectionTitle = section.querySelector('.category-title').textContent.toLowerCase();
+                            
+                            if (sectionTitle.includes(category) || 
+                                (category === 'art' && sectionTitle.includes('art')) ||
+                                (category === 'forums' && sectionTitle.includes('communities')) ||
+                                (category === 'tools' && sectionTitle.includes('utilities')) ||
+                                (category === 'archives' && sectionTitle.includes('archives')) ||
+                                (category === 'curiosities' && sectionTitle.includes('curiosities'))) {
+                                section.style.display = 'block';
+                            } else {
+                                section.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Sort filter (simplified implementation)
+            if (sortFilter) {
+                sortFilter.addEventListener('change', function () {
+                    const sortBy = sortFilter.value;
+                    const container = document.querySelector('.links-container');
+                    const cards = Array.from(container.children);
+
+                    cards.sort((a, b) => {
+                        if (sortBy === 'a-z') {
+                            return a.querySelector('.link-card-header').textContent.localeCompare(b.querySelector('.link-card-header').textContent);
+                        } else if (sortBy === 'z-a') {
+                            return b.querySelector('.link-card-header').textContent.localeCompare(a.querySelector('.link-card-header').textContent);
+                        }
+                        // Add logic for 'newest' and 'oldest' if timestamps are available
+                        return 0;
+                    });
+
+                    cards.forEach(card => container.appendChild(card));
+                });
+            }
+            
+            // Dreamy floating effect for boxes on scroll
+            const dreamyElements = document.querySelectorAll('.win98-box');
+            
+            window.addEventListener('scroll', function() {
+                dreamyElements.forEach(element => {
+                    const rect = element.getBoundingClientRect();
+                    const isInView = rect.top < window.innerHeight && rect.bottom > 0;
+                    
+                    if (isInView) {
+                        const scrollPos = window.scrollY;
+                        const offset = (scrollPos - rect.top) * 0.05;
+                        element.style.transform = `translateY(${Math.sin(offset) * 5}px)`;
+                    }
+                });
+            });
+
+            // Debounce function
+            function debounce(func, delay) {
+                let timeout;
+                return function (...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), delay);
+                };
+            }
+
+            searchInput.addEventListener('input', debounce(function () {
+                const searchTerm = searchInput.value.toLowerCase();
+                linkCards.forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    card.style.display = cardText.includes(searchTerm) ? 'flex' : 'none';
+                });
+            }, 300));
+
+            linkCards.forEach(card => {
+                const tags = card.querySelector('.link-card-tags');
+                if (!tags || !tags.textContent.trim()) {
+                    tags.textContent = 'No tags available';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
